@@ -10,7 +10,7 @@ async function checkHealth() {
       el.classList.add(ok ? 'dot-ok' : 'dot-err')
       el.title = el.title + (ok ? ' — OK' : ' — NOT AVAILABLE')
     }
-    dot('dotOllama', data.ollama)
+    dot('dotOllama', data.groq)
     dot('dotVault',  data.vault)
   } catch (_) {}
 }
