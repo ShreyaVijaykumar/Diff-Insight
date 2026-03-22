@@ -11,7 +11,7 @@ async function checkHealth() {
       el.title = el.title + (ok ? ' — OK' : ' — NOT AVAILABLE')
     }
     dot('dotOllama', data.groq)
-    dot('dotVault',  data.vault)
+    dot('dotVault',  data.github)
   } catch (_) {}
 }
 
