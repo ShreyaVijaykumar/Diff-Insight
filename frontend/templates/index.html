@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiffInsight</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ──────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="logo">DiffInsight</div>
+    <nav>
+      <div class="nav-item active" id="nav-diff">Diff Analyzer</div>
+      <div class="nav-item"        id="nav-assistant">Tech Assistant</div>
+      <div class="nav-item"        id="nav-github">GitHub Explorer</div>
+      <div class="nav-item"        id="nav-heatmap">Churn Heatmap</div>
+    </nav>
+    <div class="health-bar">
+      <div class="health-dot" id="dotOllama" title="Ollama LLM"></div>
+      <span class="health-label">LLM</span>
+      <div class="health-dot" id="dotVault" title="Vault"></div>
+      <span class="health-label">Vault</span>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ─────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ════════════════════════════════════════════════════════════
+         DIFF ANALYZER
+    ═════════════════════════════════════════════════════════════ -->
+    <section id="diff-section" class="panel active">
+
+      <!-- Upload / Paste toggle -->
+      <div class="glass-card upload-card">
+        <div class="input-toggle">
+          <button class="toggle-btn active" id="toggleFile">Upload File</button>
+          <button class="toggle-btn"        id="togglePaste">Paste Diff</button>
+        </div>
+
+        <div id="inputFile" class="upload-row">
+          <input type="file" id="diffFile" accept=".diff,.patch,.txt">
+        </div>
+
+        <div id="inputPaste" class="upload-row" style="display:none">
+          <textarea id="diffPaste" placeholder="Paste your git diff here…" rows="8"></textarea>
+        </div>
+
+        <div class="upload-row" style="margin-top:4px; gap:12px; align-items:center">
+          <label class="mode-label">Mode:</label>
+          <select id="analyzeMode">
+            <option value="reviewer">👔 Senior Reviewer</option>
+            <option value="junior">🎓 Junior Mentor</option>
+          </select>
+          <button id="analyzeBtn">Analyze Diff</button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="glass-card stats-card">
+        <pre id="stats">Files Changed:      0
+Lines Added:        0
+Lines Removed:      0
+Functions Modified: 0
+Risk Level:         —</pre>
+      </div>
+
+      <!-- Change Intelligence -->
+      <div class="glass-card intel-card">
+        <div class="card-title-row">
+          <h3 class="card-title">Change Intelligence</h3>
+          <span class="card-subtitle">Team-aware breakdown — works on any language</span>
+        </div>
+        <div id="intelligencePanel">
+          <div class="intel-empty">
+            <span style="font-size:36px">🔍</span>
+            <p>Upload or paste a diff and click Analyze<br>to see a breakdown of what changed and where.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- LLM Report -->
+      <div class="glass-card report-card">
+        <div class="card-title-row">
+          <h3 class="card-title">Analysis Report</h3>
+          <span id="modeTag" class="mode-tag"></span>
+        </div>
+        <div id="sanitiseWarning" class="sanitise-warning" style="display:none"></div>
+        <div id="loadingReport" class="loading-state" style="display:none">
+          <div class="spinner"></div>
+          <span id="loadingTimer">Analyzing… 0s</span>
+        </div>
+        <pre id="diffReport">Upload or paste a diff and click Analyze.</pre>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════════════════
+         TECH ASSISTANT
+    ═════════════════════════════════════════════════════════════ -->
+    <section id="assistant-section" class="panel">
+
+      <div class="glass-card">
+        <div class="assistant-row">
+          <input id="questionInput" placeholder="Ask a technical question…">
+          <button id="askBtn">Ask</button>
+        </div>
+        <small id="detectedTopic"></small>
+      </div>
+
+      <div class="glass-card" id="assistantCard" style="display:none">
+        <div id="loadingAssistant" class="loading-state" style="display:none">
+          <div class="spinner"></div>
+          <span id="loadingTimerAssistant">Thinking… 0s</span>
+        </div>
+        <pre id="assistantAnswer"></pre>
+      </div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════════════════
+         GITHUB EXPLORER
+    ═════════════════════════════════════════════════════════════ -->
+    <section id="github-section" class="panel">
+
+      <div class="glass-card">
+        <div class="assistant-row">
+          <input id="repoTopic"    placeholder="Search repositories… e.g. transformers">
+          <input id="repoLanguage" placeholder="Language… e.g. python" style="max-width:180px; flex:none">
+          <select id="repoSort">
+            <option value="stars">⭐ Most Stars</option>
+            <option value="forks">🍴 Most Forks</option>
+            <option value="updated">🕒 Recently Updated</option>
+            <option value="issues">🐛 Most Issues</option>
+            <option value="watchers">👁️ Most Watchers</option>
+          </select>
+          <button id="searchRepoBtn">Search</button>
+        </div>
+      </div>
+
+      <div id="repoResults"></div>
+
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════════════════
+         CHURN HEATMAP
+    ═════════════════════════════════════════════════════════════ -->
+    <section id="heatmap-section" class="panel">
+
+      <!-- Add diffs -->
+      <div class="glass-card">
+        <div class="card-title-row">
+          <h3 class="card-title">Diff Timeline & Churn Heatmap</h3>
+          <span class="card-subtitle">Add multiple diffs to see which files keep getting touched</span>
+        </div>
+
+        <!-- Chips showing added sessions -->
+        <div id="heatmapSessions" class="hm-session-list"></div>
+
+        <!-- Add form -->
+        <div class="hm-add-row">
+          <input id="hmLabel" placeholder="Label  e.g. v1→v2 or sprint-3" style="max-width:220px; flex:none">
+          <textarea id="hmDiff" placeholder="Paste a git diff here…" rows="4"></textarea>
+          <button id="hmAddBtn">Add Diff</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="hm-actions">
+          <button id="hmRunBtn">Generate Heatmap</button>
+          <button id="hmClearBtn" class="hm-ghost-btn">Clear All</button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="hmLoading" class="loading-state" style="display:none">
+        <div class="spinner"></div>
+        <span>Building heatmap…</span>
+      </div>
+
+      <!-- Results (hidden until generated) -->
+      <div id="hmOutput" style="display:none">
+
+        <!-- Summary sentence -->
+        <div class="glass-card">
+          <p id="hmSummary" class="hm-summary-text"></p>
+        </div>
+
+        <!-- Hotspot leaderboard -->
+        <div class="glass-card">
+          <div class="card-title-row">
+            <h3 class="card-title">🔥 Hotspot Leaderboard</h3>
+            <span class="card-subtitle">Top files by total churn across all diffs</span>
+          </div>
+          <div id="hmHotspots"></div>
+        </div>
+
+        <!-- Heatmap grid -->
+        <div class="glass-card hm-grid-card">
+          <div class="card-title-row">
+            <h3 class="card-title">Churn Heatmap</h3>
+            <span class="card-subtitle">Cell intensity = churn volume · hover for details</span>
+          </div>
+          <div id="hmGrid"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
