@@ -16,3 +16,5 @@ v2_to_v3.txt
 v1_to_v3.txt
 .DS_Store
 Thumbs.db
+diffinsight/
+*.zip
