@@ -73,7 +73,7 @@ Search GitHub repositories without leaving the app.
 
 ## 🚀 Live Deployment
 
-**[diff-insight-production.up.railway.app](https://diff-insight-production.up.railway.app)**
+**Live Demo**: [Diff-Insight](https://diff-insight-production.up.railway.app/)
 
 Deployed on Railway with:
 - **Groq API** (`llama-3.3-70b-versatile`) for LLM analysis — free tier, no GPU needed
