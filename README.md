@@ -2,7 +2,6 @@
 
 > **AI-powered Git diff analysis tool** — transform any git diff into structured code review reports, team-aware change breakdowns, and churn heatmaps. Built for developers, team leads, and anyone who reviews code.
 
-🌐 **Live Demo**: [Diff-Insight](https://diff-insight-production.up.railway.app/)
 
 ---
 
